@@ -1,0 +1,36 @@
+grid_map_topic: /flatland_occupancy_map/grid_map
+grid_map_visualizations:
+  - name: obstruction_map
+    type: occupancy_grid
+    params:
+     layer: obstacle
+     data_min: 0.0
+     data_max: 1.0
+
+  - name: breadth_search_grid
+    type: grid_cells
+    params:
+     layer: breadthSearch
+     lower_threshold: 0.0
+     upper_threshold: 1.0
+     
+  - name: depth_search_grid
+    type: grid_cells
+    params:
+     layer: depthSearch
+     lower_threshold: 0.0
+     upper_threshold: 1.0
+
+  - name: dijkstra_search_grid
+    type: grid_cells
+    params:
+     layer: dijkstraSearch
+     lower_threshold: 0.0
+     upper_threshold: 1.0
+
+  - name: random_search_grid
+    type: grid_cells
+    params:
+     layer: randomSearch
+     lower_threshold: 0.0
+     upper_threshold: 1.0

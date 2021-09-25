@@ -1,0 +1,10 @@
+<launch>
+  <!-- Launch the grid map iterators demo node -->
+  <node pkg="flatland" type="flatland_node" name="flatland_occupancy_map" output="screen" />
+  <!-- Launch the grid map visualizer -->
+  <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
+    <rosparam command="load" file="$(find flatland)/config/flatland.yaml" />
+  </node>
+  <!-- Launch RViz with the demo configuration -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find flatland)/rviz/flatland.rviz" />
+</launch>
