@@ -1,0 +1,10 @@
+<launch>
+  <!-- Launch the grid map iterators demo node -->
+  <node pkg="obstruction_environment" type="obstruction_environment_node" name="obstruction_environment_map" output="screen" />
+  <!-- Launch the grid map visualizer -->
+  <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
+    <rosparam command="load" file="$(find obstruction_environment)/config/obstruction_environment.yaml" />
+  </node>
+  <!-- Launch RViz with the demo configuration -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find obstruction_environment)/rviz/obstruction_environment.rviz" />
+</launch>
