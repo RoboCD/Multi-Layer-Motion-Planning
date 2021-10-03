@@ -1,6 +1,6 @@
 <launch>
   <!-- Bringup a fake turtlebot robot -->  
-  <include file="$(find turtlebot3_fake)/launch/turtlebot3_fake.launch" />
+  <!-- <include file="$(find turtlebot3_fake)/launch/turtlebot3_fake.launch" /> -->
   
   <!-- Start a move_base node --> 
   <!-- <include file="$(find rbx1_nav)/launch/fake_move_base_obstacle.launch" /> -->
@@ -15,5 +15,5 @@
   <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find vgraph)/world1.rviz" /> -->
 
   <!-- Run VGRAPH script -->
-  <node pkg="vgraph_environment" type="vgraph_environment_node" name="vgraph_environment" />
+  <node pkg="vgraph_environment" type="vgraph_environment_node" name="vgraph_environment" output="screen"/>
 </launch>
