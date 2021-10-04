@@ -97,5 +97,34 @@ visualization_msgs::Marker init_marker( int marker_id,  uint32_t marker_type ){
     m.color.g = 1.0;
     m.color.a = 1.0;
     return m;
+}
 
+std::vector<std::vector<std::pair<int, int>>> grow_obstacles ( std::vector<std::vector<std::pair<int, int>>> obstacles ){
+    std::vector<std::vector<std::pair<int, int>>> grown_obstacles;
+
+    int aabb_sidelen = 36;
+    int half = aabb_sidelen / 2;
+
+    std::pair<int, int> c1; 
+    std::pair<int, int> c2;
+    std::pair<int, int> c3;
+    std::pair<int, int> c4;
+    for (int o = 0; o < obstacles.size(); o++){
+
+        for (int c = 0; c < obstacles[o].size(); c++){
+            int coord1 = obstacles[o][c].first;
+            int coord2 = obstacles[o][c].second;
+
+            c1 = std::make_pair(coord1 - half, coord2 + half);
+            c2 = std::make_pair(coord1 + half, coord2 + half);
+            c3 = std::make_pair(coord1 - half, coord2 - half);
+            c4 = std::make_pair(coord1 + half, coord2 - half);
+           
+        }
+        grown_obstacles[o].push_back(c1);
+        grown_obstacles[o].push_back(c2);
+        grown_obstacles[o].push_back(c3);
+        grown_obstacles[o].push_back(c4);
+    }
+    return grown_obstacles;
 }
