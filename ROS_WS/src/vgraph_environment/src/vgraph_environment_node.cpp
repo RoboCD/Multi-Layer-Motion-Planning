@@ -150,9 +150,9 @@ int orientation (std::pair<int, int> a, std::pair<int, int> b, std::pair<int, in
 // point q lies on line segment 'pr'
 bool onSegment(std::pair<int, int> p, std::pair<int, int> q, std::pair<int, int> r) {
     if (q.first <= std::max(p.first, r.first) && q.first >= std::min(p.first, r.first) &&
-        q.second <= std::max(p.second, r.second) && q.second >= std::min(p.second, r.second))
+        q.second <= std::max(p.second, r.second) && q.second >= std::min(p.second, r.second)){
        return true;
-
+        }
     return false;
 }
 
@@ -173,8 +173,9 @@ bool has_intersect(std::pair<geometry_msgs::Point, geometry_msgs::Point> &e1, st
     {
         return false;
     }
-    if (o1 != o2 and o3 != o4)
+    if (o1 != o2 && o3 != o4){
         return true;
+    }
     // Special Cases
     // p1, q1 and p2 are collinear and p2 lies on segment p1q1
     // if (o1 == 0 && onSegment(p1, p2, q1)) return true;
@@ -226,9 +227,9 @@ int compare(const void *vp1, const void *vp2)
 
    // Find orientation
    int o = orientation(p0, *p1, *p2);
-   if (o == 0)
+   if (o == 0){
      return (distSq(p0, *p2) >= distSq(p0, *p1))? -1 : 1;
-
+   }
    return (o == 2)? -1: 1;
 }
 
@@ -246,9 +247,10 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
      // Pick the bottom-most or chose the left
      // most point in case of tie
      if ((y < ymin) || (ymin == y &&
-         x < points[min_index].first))
+         x < points[min_index].first)){
         ymin = points[i].second;
         min_index = i;
+        }
    }
 
    // Place the bottom-most point at first position
@@ -271,8 +273,9 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    {
        // Keep removing i while angle of i and i+1 is same
        // with respect to p0
-       while (i < n-1 && orientation(p0, points[i], points[i+1]) == 0)
+       while (i < n-1 && orientation(p0, points[i], points[i+1]) == 0){
           i++;
+       }
        points[m] = points[i];
        m++;  // Update size of modified array
    }
@@ -432,7 +435,7 @@ class Vgraph
                     std::pair<geometry_msgs::Point> e = {hull_verts[i], hull_verts[j]};
                     bool flag = true;
                     for (int p = 0; p < hull_edges.size(); p++) {
-                      if (has_intersect(hull_edges[p], edge) {
+                      if (has_intersect(hull_edges[p], edge)) {
                         flag = false;
                         break;
                       }
@@ -518,8 +521,8 @@ class Vgraph
         //     loop_rate.sleep();
         // }
         //
-
-}
+         }
+};
 
 int main(int argc, char** argv)
 {
