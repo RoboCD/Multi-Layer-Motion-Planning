@@ -324,10 +324,10 @@ class Vgraph
 {
     public:
          Vgraph() {                      // Constructor
-            ros::init(int argc, char* argv, "vgraph_environment");
+            // ros::init(int argc, char* argv, "vgraph_environment");
             ros::NodeHandle n;
             ros::Publisher marker_pub = n.advertise<visualization_msgs::MarkerArray>("vgraph_marekerarr", 10);
-            ros::Publisher this->cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 5);
+            ros::Publisher cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 5);
             ros::Rate loop_rate(30);
 
             // tf::TransformListener this->tf_listener;
@@ -373,14 +373,14 @@ class Vgraph
             std::vector<geometry_msgs::Point> verts;
             std::vector<std::vector<geometry_msgs::Point>> hull_verts;
           //  std::vector<std::pair<geometry_msgs::Point>> edges;
-            <std::vector<std::pair<geometry_msgs::Point>> hull_edges;
+            std::vector<std::pair<geometry_msgs::Point,geometry_msgs::Point>> hull_edges;
             std::vector<geometry_msgs::Point> points;
-            visualization_msgs::Marker m = init_marker(marker_id, visualization_msgs::Marker LINE_LIST);
+            visualization_msgs::Marker m = init_marker(marker_id, visualization_msgs::Marker::LINE_LIST);
             marker_id ++;
 
             // Draw convex hull around obstacles
             // some initialization as per .py file
-            for (int i=0; i < grown_obstacles.size(), i++) {
+            for (int i=0; i < grown_obstacles.size(); i++) {
               std::vector<geometry_msgs::Point> verts = convexHull(grown_obstacles[i]);
                 for (int i = 0; i < verts.size(); i++) {
                   geometry_msgs::Point p1;
@@ -401,11 +401,11 @@ class Vgraph
                   verts.push_back(p1);
                   points.push_back(p1);
                   points.push_back(p2);
-                  std::pair<geometry_msgs::Point> edge = {p1, p2};
+                  std::pair<geometry_msgs::Point,geometry_msgs::Point> edge = {p1, p2};
                   hull_edges.push_back(edge);
                 }
                 hull_verts.push_back(verts);
-                hull_edges.push_back(edges);
+                // hull_edges.push_back(edges);
             }
             m.points = points;
             marker_arr.markers.push_back(m);
@@ -414,7 +414,7 @@ class Vgraph
             // Draw paths
             // some initialization as per .py file
 
-            m = init_marker(marker_id, visualization_msgs::Marker LINE_LIST);
+            m = init_marker(marker_id, visualization_msgs::Marker::LINE_LIST);
             marker_id += 1;
             points.clear();
             verts.clear();
@@ -432,7 +432,8 @@ class Vgraph
               for (int j = 1; j < hull_verts.size(); j++) {
                 for (int k = 0; k < hull_verts[i].size(); k++) {
                   for (int l = 0; l < hull_verts[j].size(); l++) {
-                    std::pair<geometry_msgs::Point> e = {hull_verts[i], hull_verts[j]};
+                    std::pair<geometry_msgs::Point, geometry_msgs::Point> edge;
+                    edge = std::make_pair(hull_verts[i][k], hull_verts[j][l]);
                     bool flag = true;
                     for (int p = 0; p < hull_edges.size(); p++) {
                       if (has_intersect(hull_edges[p], edge)) {
@@ -441,14 +442,14 @@ class Vgraph
                       }
                     }
                     if (flag) {
-                      points.push_back(hull_verts[i]);
-                      points.push_back(hull_verts[j]);
+                      points.push_back(hull_verts[i][k]);
+                      points.push_back(hull_verts[j][l]);
                     }
                   }
                 }
               }
             }
-            this->marker_pub.publish(marker_arr);
+            marker_pub.publish(marker_arr);
         //     float this->linear_speed = 0.15;
         //     float this->angular_speed = 0.5;
         //     float this->angular_tolerance = 0.1;
@@ -526,7 +527,8 @@ class Vgraph
 
 int main(int argc, char** argv)
 {
-    Vgraph vgraph Visibility_graph();
+    ros::init(argc, argv, "vgraph_environment");
+    Vgraph vgraph_environment();
     return 0;
 
 }
