@@ -149,9 +149,9 @@ int orientation (std::pair<double, double> a, std::pair<double, double> b, std::
 // point q lies on line segment 'pr'
 bool onSegment(std::pair<int, int> p, std::pair<int, int> q, std::pair<int, int> r) {
     if (q.first <= std::max(p.first, r.first) && q.first >= std::min(p.first, r.first) &&
-        q.second <= std::max(p.second, r.second) && q.second >= std::min(p.second, r.second))
+        q.second <= std::max(p.second, r.second) && q.second >= std::min(p.second, r.second)){
        return true;
-
+        }
     return false;
 }
 
@@ -212,9 +212,9 @@ int compare(const void *vp1, const void *vp2)
 
    // Find orientation
    int o = orientation(p0, *p1, *p2);
-   if (o == 0)
+   if (o == 0){
      return (distSq(p0, *p2) >= distSq(p0, *p1))? -1 : 1;
-
+   }
    return (o == 2)? -1: 1;
 }
 
@@ -235,6 +235,7 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
         ymin = points[i].second;
         min_index = i;
       }
+
    }
 
    // Place the bottom-most point at first position
@@ -255,8 +256,9 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    for (int i=1; i<n; i++) {
        // Keep removing i while angle of i and i+1 is same
        // with respect to p0
-       while (i < n-1 && orientation(p0, points[i], points[i+1]) == 0)
+       while (i < n-1 && orientation(p0, points[i], points[i+1]) == 0){
           i++;
+       }
        points[m] = points[i];
        m++;  // Update size of modified array
    }
@@ -300,6 +302,7 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    }
    return vertices;
 }
+
 
 class Vgraph {
   public :
@@ -422,6 +425,7 @@ class Vgraph {
                 if (has_intersect(hull_edges[p], edge)) {
                   flag = false;
                   break;
+
                 }
               }
 
@@ -430,6 +434,7 @@ class Vgraph {
                 points.push_back(hull_verts[j][l]);
               }
             }
+
           }
         }
       }
