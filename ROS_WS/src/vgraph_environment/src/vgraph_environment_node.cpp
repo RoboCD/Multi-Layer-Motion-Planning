@@ -1,3 +1,6 @@
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+
 #include "ros/ros.h"
 // #include "tf"
 #include "geometry_msgs/Twist.h"
@@ -6,6 +9,7 @@
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 
+#include<iostream>
 #include<fstream>
 #include <stack>
 #include <math.h>
@@ -28,26 +32,25 @@ float normalize_angle(float angle) {
 
 std::vector<std::vector<std::pair<int, int>>> load_obstacles(std::string object_path)//, std::vector<std::vector<std::pair<int, int>>> &obstacles)
 {
-    // parsing the world_obstacles.txt file and getting the information.
-    // As obstacles is passed by reference, we dont have to return it.
+    // parsing the obstacles.txt file and getting the information.
     std::fstream fptr;                // File pointer
     fptr.open(object_path);       // Open file with your numbers as input.
     std::string tempString = "";      // variable to store the contents read by the pointer
     getline(fptr, tempString);        // read entire line and store the data as a string
-    int num_obs = stoi(tempString, nullptr, 10);  //  store the number of obstacles, which is
-                                                  //  the first line of the txt file
+    int num_obs = std::stoi(tempString, nullptr, 10);//  store the number of obstacles, which is
+                                                    //  the first line of the txt file
     std::vector<std::vector<std::pair<int, int>>> obstacles(num_obs);
     for (int i = 0; i < num_obs; i++) {
       getline(fptr, tempString);
-      int num_points = stoi(tempString, nullptr, 10);   // number of points in an obstacle
+      int num_points = std::stoi(tempString, nullptr, 10);   // number of points in an obstacle
       for (int j = 0; j < num_points; j++){
         std::pair<int, int> point; // This variable will store coordinates (x, y)
         getline(fptr, tempString);    // Read in the line from the file.
         std::stringstream ss(tempString);    // Convert from a string to a string stream.
         getline(ss, tempString, ' ');       // Get the x coordinate (as a string) with ' ' as the delimiter
-        point.first = stoi(tempString, nullptr, 10);
+        point.first = std::stoi(tempString, nullptr, 10);
         getline(ss, tempString, '\n');      // Get the y coordinate (as a string) with '\n' as the delimiter
-        point.second = stoi(tempString, nullptr, 10);
+        point.second = std::stoi(tempString, nullptr, 10);
         obstacles[i].push_back(point);  // Append the coordinates to the vector.
       }
     }
@@ -56,45 +59,40 @@ std::vector<std::vector<std::pair<int, int>>> load_obstacles(std::string object_
 }
 
 std::pair<int, int> load_goal(std::string goal_path) { // parsing the goal.txt file and getting the information and should return a vector
-  std::fstream gptr;             // File pointer
-  gptr.open(goal_path);            // Open file with your numbers as input
-  std::string tmpString = "";      // variable to store the contents read by the pointer
-  std::pair<int, int> goal; // This variable will store coordinates (x, y)
-  getline(gptr, tmpString);    // Read in the line from the file.
-  std::stringstream ss(tmpString);    // Convert from a string to a string stream.
-  getline(ss, tmpString, ' ');       // Get the x coordinate (as a string) with ' ' as the delimiter
-  goal.first = stoi(tmpString, nullptr, 10);
-  getline(ss, tmpString, '\n');      // Get the y coordinate (as a string) with '\n' as the delimiter
-  goal.second = stoi(tmpString, nullptr, 10);
-  gptr.close();
-  return goal;
+    std::fstream gptr;             // File pointer
+    gptr.open(goal_path);            // Open file with your numbers as input
+    std::string tmpString = " ";      // variable to store the contents read by the pointer
+    std::pair<int, int> goal; // This variable will store coordinates (x, y)
+    getline(gptr, tmpString);    // Read in the line from the file.
+    std::stringstream ss(tmpString);    // Convert from a string to a string stream.
+    getline(ss, tmpString, ' ');       // Get the x coordinate (as a string) with ' ' as the delimiter
+    goal.first = std::stoi(tmpString, nullptr, 10);
+    getline(ss, tmpString, '\n');      // Get the y coordinate (as a string) with '\n' as the delimiter
+    goal.second = std::stoi(tmpString, nullptr, 10);
+    gptr.close();
+    return goal;
 }
 
 std::vector<std::vector<std::pair<int, int>>> grow_obstacles (std::vector<std::vector<std::pair<int, int>>> obstacles){
 
-    std::vector<std::vector<std::pair<int, int>>> grown_obstacles;
+    std::vector<std::vector<std::pair<int, int>>> grown_obstacles(obstacles.size());
     int aabb_sidelen = 36;
     int half = aabb_sidelen / 2;
 
-    std::pair<int, int> c1;
-    std::pair<int, int> c2;
-    std::pair<int, int> c3;
-    std::pair<int, int> c4;
     for (int o = 0; o < obstacles.size(); o++){
         for (int c = 0; c < obstacles[o].size(); c++){
             int coord1 = obstacles[o][c].first;
             int coord2 = obstacles[o][c].second;
-
-            c1 = std::make_pair(coord1 - half, coord2 + half);
-            c2 = std::make_pair(coord1 + half, coord2 + half);
-            c3 = std::make_pair(coord1 - half, coord2 - half);
-            c4 = std::make_pair(coord1 + half, coord2 - half);
-
+            std::pair<int, int> c1 = std::make_pair(coord1 - half, coord2 + half);
+            std::pair<int, int> c2 = std::make_pair(coord1 + half, coord2 + half);
+            std::pair<int, int> c3 = std::make_pair(coord1 - half, coord2 - half);
+            std::pair<int, int> c4 = std::make_pair(coord1 + half, coord2 - half);
+            grown_obstacles[o].push_back(c1);
+            grown_obstacles[o].push_back(c2);
+            grown_obstacles[o].push_back(c3);
+            grown_obstacles[o].push_back(c4);
         }
-        grown_obstacles[o].push_back(c1);
-        grown_obstacles[o].push_back(c2);
-        grown_obstacles[o].push_back(c3);
-        grown_obstacles[o].push_back(c4);
+
     }
     return grown_obstacles;
 }
@@ -106,10 +104,11 @@ std::vector<std::vector<std::pair<int, int>>> grow_obstacles (std::vector<std::v
 //     return sqrt(pow(a[0]- b[0], 2) + pow(a[1]- b[1], 2))
 // }
 
-bool verts_equal(std::pair<int, int> &v1, std::pair<int, int> &v2)
+bool verts_equal(std::pair<double, double> &v1, std::pair<double, double> &v2)
 {
     return ((v1.first == v2.first) && (v1.second == v2.second));
 }
+
 
 visualization_msgs::Marker init_marker( int marker_id,  uint32_t marker_type ){
     visualization_msgs::Marker m;
@@ -133,8 +132,8 @@ visualization_msgs::Marker init_marker( int marker_id,  uint32_t marker_type ){
 // 0 --> p, q and r are collinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-int orientation (std::pair<int, int> a, std::pair<int, int> b, std::pair<int, int> c) {
-  float val = ((b.second- a.second)*(c.first - b.first) - (c.second-b.second)*(b.first-a.first));
+int orientation (std::pair<double, double> a, std::pair<double, double> b, std::pair<double, double> c) {
+  float val = ((b.second- a.second)*(c.first - b.first) - (c.second-b.second)*(b.first - a.first));
   if(val == 0) {
       return 0;
   }
@@ -160,33 +159,20 @@ bool onSegment(std::pair<int, int> p, std::pair<int, int> q, std::pair<int, int>
 // and 'e2 with points b1 and b2' intersect.
 bool has_intersect(std::pair<geometry_msgs::Point, geometry_msgs::Point> &e1, std::pair<geometry_msgs::Point, geometry_msgs::Point> &e2)
 {
-    std::pair<int, int> a1 = {e1.first.x, e1.first.y};
-    std::pair<int, int> a2 = {e1.second.x, e1.second.y};
-    std::pair<int, int> b1 = {e2.first.x, e2.first.y};
-    std::pair<int, int> b2 = {e2.second.x, e2.second.y};
+    std::pair<double, double> a1 = {e1.first.x, e1.first.y};
+    std::pair<double, double> a2 = {e1.second.x, e1.second.y};
+    std::pair<double, double> b1 = {e2.first.x, e2.first.y};
+    std::pair<double, double> b2 = {e2.second.x, e2.second.y};
     int o1 = orientation(a1, a2, b1);
     int o2 = orientation(a1, a2, b2);
     int o3 = orientation(b1, b2, a1);
     int o4 = orientation(b1, b2, a2);
 
     if (verts_equal(a1, b1) || verts_equal(a1, b2) || verts_equal(a2, b1) || verts_equal(a2, b2))
-    {
         return false;
-    }
-    if (o1 != o2 and o3 != o4)
+
+    if ((o1 != o2) && (o3 != o4))
         return true;
-    // Special Cases
-    // p1, q1 and p2 are collinear and p2 lies on segment p1q1
-    // if (o1 == 0 && onSegment(p1, p2, q1)) return true;
-    //
-    // // p1, q1 and q2 are collinear and q2 lies on segment p1q1
-    // if (o2 == 0 && onSegment(p1, q2, q1)) return true;
-    //
-    // // p2, q2 and p1 are collinear and p1 lies on segment p2q2
-    // if (o3 == 0 && onSegment(p2, p1, q2)) return true;
-    //
-    // // p2, q2 and q1 are collinear and q1 lies on segment p2q2
-    // if (o4 == 0 && onSegment(p2, q1, q2)) return true;
 
     return false;
 }
@@ -242,13 +228,13 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    {
      int x = points[i].first;
      int y = points[i].second;
-
      // Pick the bottom-most or chose the left
      // most point in case of tie
      if ((y < ymin) || (ymin == y &&
-         x < points[min_index].first))
+         x < points[min_index].first)) {
         ymin = points[i].second;
         min_index = i;
+      }
    }
 
    // Place the bottom-most point at first position
@@ -260,15 +246,13 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    // direction) than p1
    p0 = points[0];
    qsort(&points[1], n-1, sizeof(std::pair<int, int>), compare);
-
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
    // Remember that, in above sorting, our criteria was
    // to keep the farthest point at the end when more than
    // one points have same angle.
    int m = 1; // Initialize size of modified array
-   for (int i=1; i<n; i++)
-   {
+   for (int i=1; i<n; i++) {
        // Keep removing i while angle of i and i+1 is same
        // with respect to p0
        while (i < n-1 && orientation(p0, points[i], points[i+1]) == 0)
@@ -317,213 +301,226 @@ std::vector<geometry_msgs::Point> convexHull(std::vector<std::pair<int, int>> po
    return vertices;
 }
 
-class Vgraph
-{
-    public:
-         Vgraph() {                      // Constructor
-            ros::init(int argc, char* argv, "vgraph_environment");
-            ros::NodeHandle n;
-            ros::Publisher marker_pub = n.advertise<visualization_msgs::MarkerArray>("vgraph_marekerarr", 10);
-            ros::Publisher this->cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 5);
-            ros::Rate loop_rate(30);
+class Vgraph {
+  public :
+    Vgraph(int argc, char** argv) {
+      ros::init(argc, argv, "vgraph_environment");
+      ros::NodeHandle n;
+      ros::Publisher marker_pub = n.advertise<visualization_msgs::MarkerArray>("vgraph_markerarr", 10);
+      // ros::Publisher cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 5);
+      ros::Rate loop_rate(30);
 
-            // tf::TransformListener this->tf_listener;
-            // loop_rate.sleep(2);
-            //
-            // this->odom_frame = "/odom";
-            // tf::StampedTransform transform;
-            // try
-            // {
-            //     this->tf_listener.lookupTransform(this->odom_frame, "/base_footprint",ros::Time(0), transform);
-            //     this->base_frame = '/base_footprint';
-            // }
-            // catch(tf::TransformException ex)
-            // {
-            //     try
-            //     {
-            //         this->tf_listener.lookupTransform(this->odom_frame, "/base_link",ros::Time(0), transform);
-            //         this->base_frame = '/base_link';
-            //     }
-            //     catch(tf::TransformException ex)
-            //     {
-            //         ROS_ERROR("%s",ex.what());
-            //         ros::Duration(1.0).sleep();
-            //     }
-            // }
+      // tf::TransformListener this->tf_listener;
+      // loop_rate.sleep(2);
+      //
+      // this->odom_frame = "/odom";
+      // tf::StampedTransform transform;
+      // try
+      // {
+      //     this->tf_listener.lookupTransform(this->odom_frame, "/base_footprint",ros::Time(0), transform);
+      //     this->base_frame = '/base_footprint';
+      // }
+      // catch(tf::TransformException ex)
+      // {
+      //     try
+      //     {
+      //         this->tf_listener.lookupTransform(this->odom_frame, "/base_link",ros::Time(0), transform);
+      //         this->base_frame = '/base_link';
+      //     }
+      //     catch(tf::TransformException ex)
+      //     {
+      //         ROS_ERROR("%s",ex.what());
+      //         ros::Duration(1.0).sleep();
+      //     }
+      // }
 
-            // float aabb_sidelen = 36;
-            // float half = aabb_sidelen/2;
-            float scale_factor = 100;
+      float scale_factor = 100;
+      std::string object_path = "/home/prajwal/Desktop/rbe500-ros/src/vgraph_environment/src/obstacles.txt";
+      std::vector<std::vector<std::pair<int, int>>> obstacles = load_obstacles(object_path);
 
-            std::string object_path = "obstacles.txt";
-            std::vector<std::vector<std::pair<int, int>>> obstacles = load_obstacles(object_path);
+      std::vector<std::vector<std::pair<int, int>>> grown_obstacles = grow_obstacles(obstacles);
 
-            std::vector<std::vector<std::pair<int, int>>> grown_obstacles = grow_obstacles(obstacles);
+      std::string goal_path = "/home/prajwal/Desktop/rbe500-ros/src/vgraph_environment/src/goal.txt";
+      std::pair<int, int> goal = load_goal(goal_path);
+      std::pair<int, int> start {0,0};
 
-            std::string goal_path = "goal.txt";
-            std::pair<int, int> goal = load_goal(goal_path);
-            std::pair<int, int> start {0,0};
+      visualization_msgs::MarkerArray marker_arr;
+      int marker_id = 0;
 
-            visualization_msgs::MarkerArray marker_arr;
-            int marker_id = 0;
+      std::vector<geometry_msgs::Point> vertices;
+      std::vector<std::vector<geometry_msgs::Point>> hull_verts;
+      std::vector<std::pair<geometry_msgs::Point, geometry_msgs::Point>> hull_edges;
+      std::vector<geometry_msgs::Point> points;
+      visualization_msgs::Marker m = init_marker(marker_id, visualization_msgs::Marker::LINE_LIST);
+      marker_id ++;
 
-            std::vector<geometry_msgs::Point> verts;
-            std::vector<std::vector<geometry_msgs::Point>> hull_verts;
-          //  std::vector<std::pair<geometry_msgs::Point>> edges;
-            <std::vector<std::pair<geometry_msgs::Point>> hull_edges;
-            std::vector<geometry_msgs::Point> points;
-            visualization_msgs::Marker m = init_marker(marker_id, visualization_msgs::Marker LINE_LIST);
-            marker_id ++;
+      // Draw convex hull around obstacles
+      // some initialization as per .py file
+      for (int i=0; i < grown_obstacles.size(); i++) {
+        std::vector<geometry_msgs::Point> verts = convexHull(grown_obstacles[i]);
+        int size = verts.size();
+        vertices.clear();
+        for (int j = 0; j < size; j++) {
+          geometry_msgs::Point p1;
+          geometry_msgs::Point p2;
+          p1.x = verts[j].x / scale_factor;
+          p1.y = verts[j].y / scale_factor;
+          p1.z = verts[j].z / scale_factor;
+          if (j == verts.size() - 1) {
+            p2.x = verts[0].x / scale_factor;
+            p2.y = verts[0].y / scale_factor;
+            p2.z = verts[0].z / scale_factor;
 
-            // Draw convex hull around obstacles
-            // some initialization as per .py file
-            for (int i=0; i < grown_obstacles.size(), i++) {
-              std::vector<geometry_msgs::Point> verts = convexHull(grown_obstacles[i]);
-                for (int i = 0; i < verts.size(); i++) {
-                  geometry_msgs::Point p1;
-                  geometry_msgs::Point p2;
-                  p1.x = verts[i].x / scale_factor;
-                  p1.y = verts[i].y / scale_factor;
-                  p1.z = verts[i].z / scale_factor;
-                  if (i = verts.size() - 1) {
-                    p2.x = verts[0].x / scale_factor;
-                    p2.y = verts[0].y / scale_factor;
-                    p2.z = verts[0].z / scale_factor;
-                  }
-                  else {
-                    p2.x = verts[i+1].x / scale_factor;
-                    p2.y = verts[i+1].y / scale_factor;
-                    p2.z = verts[i+1].z / scale_factor;
-                  }
-                  verts.push_back(p1);
-                  points.push_back(p1);
-                  points.push_back(p2);
-                  std::pair<geometry_msgs::Point> edge = {p1, p2};
-                  hull_edges.push_back(edge);
-                }
-                hull_verts.push_back(verts);
-                hull_edges.push_back(edges);
-            }
-            m.points = points;
-            marker_arr.markers.push_back(m);
+          }
+          else {
+            p2.x = verts[j+1].x / scale_factor;
+            p2.y = verts[j+1].y / scale_factor;
+            p2.z = verts[j+1].z / scale_factor;
+          }
+          vertices.push_back(p1);
+          points.push_back(p1);
+          points.push_back(p2);
+          std::pair<geometry_msgs::Point, geometry_msgs::Point> edge = {p1, p2};
+          hull_edges.push_back(edge);
+        }
+        hull_verts.push_back(vertices);
+      }
+
+      m.points = points;            //Push all points of convex hull into marker array
+      marker_arr.markers.push_back(m);
 
 
-            // Draw paths
-            // some initialization as per .py file
+      // // Draw paths
+      // // some initialization as per .py file
 
-            m = init_marker(marker_id, visualization_msgs::Marker LINE_LIST);
-            marker_id += 1;
-            points.clear();
-            verts.clear();
+      visualization_msgs::Marker marker = init_marker(marker_id, visualization_msgs::Marker::LINE_LIST);
+      marker_id ++;
+      points.clear();
+      vertices.clear();
 
-            geometry_msgs::Point start_point, goal_point;
-            start_point.x = start.first / scale_factor;
-            start_point.y = start.second / scale_factor;
-            start_point.z = 0;
+      geometry_msgs::Point start_point, goal_point;
+      start_point.x = start.first / scale_factor;
+      start_point.y = start.second / scale_factor;
+      start_point.z = 0;
 
-            goal_point.x = goal.first / scale_factor;
-            goal_point.y = goal.second / scale_factor;
-            goal_point.z = 0;
+      goal_point.x = goal.first / scale_factor;
+      goal_point.y = goal.second / scale_factor;
+      goal_point.z = 0;
+      std::vector<geometry_msgs::Point> goal_vector {goal_point};
+      std::vector<geometry_msgs::Point> start_vector {start_point};
+      hull_verts.push_back(start_vector);
+      hull_verts.push_back(goal_vector);
 
-            for(int i = 0; i < hull_verts.size() - 1; i++) {
-              for (int j = 1; j < hull_verts.size(); j++) {
-                for (int k = 0; k < hull_verts[i].size(); k++) {
-                  for (int l = 0; l < hull_verts[j].size(); l++) {
-                    std::pair<geometry_msgs::Point> e = {hull_verts[i], hull_verts[j]};
-                    bool flag = true;
-                    for (int p = 0; p < hull_edges.size(); p++) {
-                      if (has_intersect(hull_edges[p], edge) {
-                        flag = false;
-                        break;
-                      }
-                    }
-                    if (flag) {
-                      points.push_back(hull_verts[i]);
-                      points.push_back(hull_verts[j]);
-                    }
-                  }
+      std::vector<geometry_msgs::Point> temp;
+      for(int i = 0; i < hull_verts.size() - 1; i++) {
+        for (int j = i + 1; j < hull_verts.size(); j++) {
+          for (int k = 0; k < hull_verts[i].size(); k++) {
+            for (int l = 0; l < hull_verts[j].size(); l++) {
+              std::pair<geometry_msgs::Point, geometry_msgs::Point> edge = {hull_verts[i][k], hull_verts[j][l]};
+              bool flag = true;
+              for (int p = 0; p < hull_edges.size(); p++) {
+                if (has_intersect(hull_edges[p], edge)) {
+                  flag = false;
+                  break;
                 }
               }
-            }
-            this->marker_pub.publish(marker_arr);
-        //     float this->linear_speed = 0.15;
-        //     float this->angular_speed = 0.5;
-        //     float this->angular_tolerance = 0.1;
-        //
-        //
-        // }
-        //
-        // void translate(goal_distance)
-        // {
-        //     geometry_msgs::Twist move_cmd;
-        //     move_cmd.linear.x = this->linear_speed;
-        //     // need to call get_odom function. Currently assuming we got position and rotation value.
-        //     float x_start = position.x;
-        //     float y_start = position.y;
-        //     float distance = 0;
-        //     while(distance < goal_distance)
-        //     {
-        //         this->cmd_vel.publish(move_cmd);
-        //         // need to call get_odom function. Currently assuming we got position and rotation value.
-        //         distance = sqrt(pow(position.x- x_start, 2) + pow(position.y- y_start, 2))
-        //     }
-        //     move_cmd.linear.x = 0;
-        //     this->cmd_vel.publish(move_cmd);
-        //     loop_rate.sleep();
-        //
-        // }
-        //
-        // void rotate(goal_angle)
-        // {
-        //     geometry_msgs::Twist move_cmd;
-        //     move_cmd.angular.z = this->angular_speed;
-        //     if(goal_angle > 0)
-        //     {
-        //         this->angular_speed = -(this->angular_speed);
-        //     }
-        //
-        //     // need to call get_odom function. Currently assuming we got position and rotation value.
-        //     float last_angle = rotation;
-        //     float turn_angle = 0;
-        //     while(abs(turn_angle + this->angular_tolerance) < abs(goal_angle))
-        //     {
-        //         this->cmd_vel.publish(move_cmd);
-        //         // need to call get_odom function. Currently assuming we got position and rotation value.
-        //         float delta_angle = normalize(rotation - last_angle);
-        //         turn_angle = turn_angle + delta_angle;
-        //         last_angle = rotation;
-        //
-        //     }
-        //     move_cmd.angular.z = 0;
-        //     this->cmd_vel.publish(move_cmd);
-        //     loop_rate.sleep();
-        //
-        //
-        // }
-        //
-        // void get_odom()
-        // {
-        //     geometry_msgs::Point
-        //     try
-        //     {
-        //         this->tf_listener.lookupTransform(this->odom_frame, this->base_frame,ros::Time(0), transform); // Not  able to figure what will be the output of this line. Need to figure something for that.
-        //     }
-        // }
-        //
-        // void shutdown()
-        // {
-        //     ROS_INFO("Stopping the robot !!");
-        //     geometry_msgs::Twist move_cmd;
-        //     this->cmd_vel.publish(move_cmd);
-        //     loop_rate.sleep();
-        // }
-        //
 
-}
+              if (flag == true) {
+                points.push_back(hull_verts[i][k]);
+                points.push_back(hull_verts[j][l]);
+              }
+            }
+          }
+        }
+      }
+      marker.points = points;
+      marker_arr.markers.push_back(marker);
+
+      while (ros::ok) {
+        marker_pub.publish(marker_arr);
+      }
+
+
+  //     float this->linear_speed = 0.15;
+  //     float this->angular_speed = 0.5;
+  //     float this->angular_tolerance = 0.1;
+  //
+  //
+  // }
+  //
+  // void translate(goal_distance)
+  // {
+  //     geometry_msgs::Twist move_cmd;
+  //     move_cmd.linear.x = this->linear_speed;
+  //     // need to call get_odom function. Currently assuming we got position and rotation value.
+  //     float x_start = position.x;
+  //     float y_start = position.y;
+  //     float distance = 0;
+  //     while(distance < goal_distance)
+  //     {
+  //         this->cmd_vel.publish(move_cmd);
+  //         // need to call get_odom function. Currently assuming we got position and rotation value.
+  //         distance = sqrt(pow(position.x- x_start, 2) + pow(position.y- y_start, 2))
+  //     }
+  //     move_cmd.linear.x = 0;
+  //     this->cmd_vel.publish(move_cmd);
+  //     loop_rate.sleep();
+  //
+  // }
+  //
+  // void rotate(goal_angle)
+  // {
+  //     geometry_msgs::Twist move_cmd;
+  //     move_cmd.angular.z = this->angular_speed;
+  //     if(goal_angle > 0)
+  //     {
+  //         this->angular_speed = -(this->angular_speed);
+  //     }
+  //
+  //     // need to call get_odom function. Currently assuming we got position and rotation value.
+  //     float last_angle = rotation;
+  //     float turn_angle = 0;
+  //     while(abs(turn_angle + this->angular_tolerance) < abs(goal_angle))
+  //     {
+  //         this->cmd_vel.publish(move_cmd);
+  //         // need to call get_odom function. Currently assuming we got position and rotation value.
+  //         float delta_angle = normalize(rotation - last_angle);
+  //         turn_angle = turn_angle + delta_angle;
+  //         last_angle = rotation;
+  //
+  //     }
+  //     move_cmd.angular.z = 0;
+  //     this->cmd_vel.publish(move_cmd);
+  //     loop_rate.sleep();
+  //
+  //
+  // }
+  //
+  // void get_odom()
+  // {
+  //     geometry_msgs::Point
+  //     try
+  //     {
+  //         this->tf_listener.lookupTransform(this->odom_frame, this->base_frame,ros::Time(0), transform); // Not  able to figure what will be the output of this line. Need to figure something for that.
+  //     }
+  // }
+  //
+  // void shutdown()
+  // {
+  //     ROS_INFO("Stopping the robot !!");
+  //     geometry_msgs::Twist move_cmd;
+  //     this->cmd_vel.publish(move_cmd);
+  //     loop_rate.sleep();
+  // }
+  //
+
+    }
+};
+
+
+
 
 int main(int argc, char** argv)
 {
-    Vgraph vgraph Visibility_graph();
-    return 0;
-
+    Vgraph vgraph(argc, argv);
 }
