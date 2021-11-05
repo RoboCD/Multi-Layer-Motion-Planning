@@ -1,0 +1,8 @@
+prefix=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/install
+
+Name: flatland
+Description: Description of flatland
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: grid_map_core

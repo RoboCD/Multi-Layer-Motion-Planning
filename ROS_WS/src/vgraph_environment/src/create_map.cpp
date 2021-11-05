@@ -65,7 +65,7 @@ int main() {
 
 
   //**************************************LOAD START***************************************//
-  std::pair<int, int> start = {0, 0};
+  std::pair<int, int> start = {-200, 0};
   //**************************************//LOAD START//***************************************//
 
   //**************************************TRANSFORM OBSTACLE COORDINATES***************************************//
@@ -116,7 +116,7 @@ int main() {
 
 
    //********************************BRESENHAM LINE DRAWING ALGORITHM*********************************//
-    std::vector<std::vector<std::vector<std::pair<int, int>>>> rasterized_line (transformed_obstacles.size());
+   std::vector<std::vector<std::vector<std::pair<int, int>>>> rasterized_line (transformed_obstacles.size());
    for (int i = 0; i < transformed_obstacles.size(); i++) {
      for (int j = 0; j < transformed_obstacles[i].size(); j++) {
        std::pair<int, int> points[2];
@@ -289,6 +289,7 @@ int main() {
     // // first argument: name of the window
     // // second argument: image to be shown(Mat object)
    cv::imshow("Obstacle_Map", img);
+   cv::imwrite("/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/src/vgraph_environment/map/Obstacle_Map.png", img);
     //
    cv::waitKey(0); //wait infinite time for a keypress
     //

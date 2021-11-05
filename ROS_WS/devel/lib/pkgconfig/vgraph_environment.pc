@@ -1,0 +1,8 @@
+prefix=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/devel
+
+Name: vgraph_environment
+Description: Description of vgraph_environment
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

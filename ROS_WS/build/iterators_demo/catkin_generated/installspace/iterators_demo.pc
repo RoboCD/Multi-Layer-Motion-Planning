@@ -1,0 +1,8 @@
+prefix=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/install
+
+Name: iterators_demo
+Description: Description of iterators_demo
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: grid_map_core grid_map_ros roscpp rospy std_msgs
