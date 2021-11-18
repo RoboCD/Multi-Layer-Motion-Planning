@@ -1,2 +1,0 @@
-Visibility_graph/vgraph:flatland:iterators_demo:obstruction_environment:turtlebot3_simulations/turtlebot3_fake:turtlebot3_simulations/turtlebot3_gazebo:turtlebot3_simulations/turtlebot3_simulations:vgraph_environment
--DCATKIN_DEVEL_PREFIX=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/devel -DCMAKE_INSTALL_PREFIX=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/install -G Unix Makefiles

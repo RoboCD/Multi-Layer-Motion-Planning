@@ -1,8 +1,0 @@
-prefix=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/install
-
-Name: obstruction_environment
-Description: Description of obstruction_environment
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

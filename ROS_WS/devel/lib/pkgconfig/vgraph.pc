@@ -1,8 +1,0 @@
-prefix=/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/devel
-
-Name: vgraph
-Description: Description of vgraph
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
