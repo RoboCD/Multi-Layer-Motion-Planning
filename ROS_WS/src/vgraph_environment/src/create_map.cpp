@@ -289,7 +289,8 @@ int main() {
     // // first argument: name of the window
     // // second argument: image to be shown(Mat object)
    cv::imshow("Obstacle_Map", img);
-   cv::imwrite("/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/src/vgraph_environment/map/Obstacle_Map.png", img);
+  //  cv::imwrite("/home/prajwal/Desktop/Motion Planning/Group Project/Multi-Layer-Motion-Planning/ROS_WS/src/vgraph_environment/map/Obstacle_Map.png", img);
+   cv::imwrite("/home/chris/Desktop/git/Multi-Layer-Motion-Planning/ROS_WS/src/vgraph_environment/map/Obstacle_Map.png", img);
     //
    cv::waitKey(0); //wait infinite time for a keypress
     //
